@@ -5,10 +5,58 @@
  * this file and include it in basic-server.js so that it actually works.
  * *Hint* Check out the node module documentation at http://nodejs.org/api/modules.html. */
 // export
+//
+var defaultCorsHeaders = {
+  "access-control-allow-origin": "*",
+  "access-control-allow-methods": "GET, POST, PUT, DELETE, OPTIONS",
+  "access-control-allow-headers": "content-type, accept, X-Parse-Application-Id, X-Parse-REST-API-Key",
+  "access-control-max-age": 10 // Seconds.
+};
 
 var results = [];
+var objectId = 0;
+var url = require('url');
+var path = require("path");
+var fs = require("fs");
+
+//setup server to serve html;
 
 exports.handleRequest = function(request, response) {
+
+
+//   var content = '';
+//   var fileName = path.basename(request.url);//the file that was requested
+//   var localFolder = __dirname + '/public/';//where our public files are located
+
+//     //NOTE: __dirname returns the root folder that
+//     //this javascript file is in.
+// console.log("request.url:", request.url, "fileName", fileName);
+//   if(fileName === 'index.html'){//if index.html was requested...
+//     content = localFolder + fileName;//setup the file name to be returned
+//     console.log("content:", content)
+//         //reads the file referenced by 'content'
+//         //and then calls the anonymous function we pass in
+//     fs.readFile(content,function(err,contents){
+//         //if the fileRead was successful...
+//         if(!err){
+//           console.log("no error");
+//             //send the contents of index.html
+//             //and then close the request
+//             response.end(contents);
+//         } else {
+//             //otherwise, let us inspect the eror
+//             //in the console
+//             console.dir(err);
+//         };
+//       });
+//   } else {
+//       //if the file was not found, set a 404 header...
+//       response.writeHead(404, {'Content-Type': 'text/html'});
+//       //send a custom 'file not found' message
+//       //and then close the request
+//       response.end('<h1>Sorry, the page you are looking for cannot be found.</h1>');
+//   };
+
   /* the 'request' argument comes from nodes http module. It includes info about the
   request - such as what URL the browser is requesting. */
 
@@ -18,7 +66,12 @@ exports.handleRequest = function(request, response) {
   console.log("Serving request type " + request.method + " for url " + request.url);
 
   var statusCode = 404;
+
   if (request.url === "/classes/messages" && request.method === "GET") {
+    statusCode = 200;
+  }
+
+  if (request.url === "/classes/messages" && request.method === "OPTIONS") {
     statusCode = 200;
   }
 
@@ -30,8 +83,14 @@ exports.handleRequest = function(request, response) {
       string += text;
     });
     request.on("end", function() {
-    var parsed = JSON.parse(string);
-    results.push(parsed);
+      var parsed = JSON.parse(string);
+      //add a unique objectID to each message
+      parsed["objectId"] = objectId;
+      objectId++;
+
+      //add a createdAt time
+      parsed["createdAt"] = new Date();
+      results.push(parsed);
     });
   }
 
@@ -39,7 +98,7 @@ exports.handleRequest = function(request, response) {
    * below about CORS. */
   var headers = defaultCorsHeaders;
 
-  headers["Content-Type"] = "text/plain";
+  headers["Content-Type"] = "application/json";
 
   /* .writeHead() tells our server what HTTP status code to send back */
   response.writeHead(statusCode, headers);
@@ -53,7 +112,6 @@ exports.handleRequest = function(request, response) {
   // results.push(request.json);
   // }
   var messages = JSON.stringify({results: results});
-
   response.end(messages);
 };
 
@@ -106,9 +164,4 @@ exports.handler = function(request, response) {
  * are on different domains. (Your chat client is running from a url
  * like file://your/chat/client/index.html, which is considered a
  * different domain.) */
-var defaultCorsHeaders = {
-  "access-control-allow-origin": "*",
-  "access-control-allow-methods": "GET, POST, PUT, DELETE, OPTIONS",
-  "access-control-allow-headers": "content-type, accept",
-  "access-control-max-age": 10 // Seconds.
-};
+

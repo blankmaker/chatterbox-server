@@ -59,10 +59,10 @@ $(function() {
         contentType: 'application/json',
         // data: { order: '-createdAt'},
         success: function(data) {
-          console.log('chatterbox: Messages fetched');
+          console.log('chatterbox: Messages fetched', "data: ", data);
 
           // Don't bother if we have nothing to work with
-          if (!data.results || !data.results.length) { return; }
+          if (!data.results || !data.results.length) {app.stopSpinner(); return; }
 
           // Get the last message
           var mostRecentMessage = data.results[data.results.length-1];
