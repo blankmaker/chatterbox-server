@@ -84,7 +84,7 @@ it('Should respond with messages that were previously posted', function() {
     var req = new stubs.request('/classes/room1', 'POST', stubMsg);
     var res = new stubs.response();
 
-    handler.handler(req, res);
+    handler.handleRequest(req, res);
 
     expect(res._responseCode).to.equal(201);
 

@@ -4,8 +4,15 @@
  * You'll have to figure out a way to export this function from
  * this file and include it in basic-server.js so that it actually works.
  * *Hint* Check out the node module documentation at http://nodejs.org/api/modules.html. */
+// export
 
-var handleRequest = function(request, response) {
+var results = [];
+var string = "";
+
+exports.handleRequest = function(request, response) {
+
+//exports.handler = function(request, response) {
+
   /* the 'request' argument comes from nodes http module. It includes info about the
   request - such as what URL the browser is requesting. */
 
@@ -14,7 +21,22 @@ var handleRequest = function(request, response) {
 
   console.log("Serving request type " + request.method + " for url " + request.url);
 
-  var statusCode = 200;
+  var statusCode = 404;
+  if (request.url === "/classes/messages" && request.method === 'GET') {
+    statusCode = 200;
+  }
+
+  if (request.url === "/classes/messages" && request.method === 'POST') {
+    statusCode = 201;
+
+    request.on('data', function(text){
+      string += text;
+    });
+    request.on('end', function() {
+    var parsed = JSON.parse(string);
+    results.push(parsed);
+    });
+  }
 
   /* Without this line, this server wouldn't work. See the note
    * below about CORS. */
@@ -29,7 +51,13 @@ var handleRequest = function(request, response) {
    * anything back to the client until you do. The string you pass to
    * response.end() will be the body of the response - i.e. what shows
    * up in the browser.*/
-  response.end("Hello, World!");
+  // console.log(request);
+  // if (request.method === 'POST') {
+  results.push(request.json);
+  // }
+  var messages = JSON.stringify({results: results});
+
+  response.end(messages);
 };
 
 /* These headers will allow Cross-Origin Resource Sharing (CORS).
