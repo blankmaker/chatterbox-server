@@ -1,4 +1,4 @@
-/* You should implement your request handler function in this file.
+                   /* You should implement your request handler function in this file.
  * And hey! This is already getting passed to http.createServer()
  * in basic-server.js. But it won't work as is.
  * You'll have to figure out a way to export this function from
@@ -7,12 +7,8 @@
 // export
 
 var results = [];
-var string = "";
 
 exports.handleRequest = function(request, response) {
-
-//exports.handler = function(request, response) {
-
   /* the 'request' argument comes from nodes http module. It includes info about the
   request - such as what URL the browser is requesting. */
 
@@ -22,17 +18,18 @@ exports.handleRequest = function(request, response) {
   console.log("Serving request type " + request.method + " for url " + request.url);
 
   var statusCode = 404;
-  if (request.url === "/classes/messages" && request.method === 'GET') {
+  if (request.url === "/classes/messages" && request.method === "GET") {
     statusCode = 200;
   }
 
-  if (request.url === "/classes/messages" && request.method === 'POST') {
+  if (request.url === "/classes/messages" && request.method === "POST") {
     statusCode = 201;
 
-    request.on('data', function(text){
+    var string = "";
+    request.on("data", function(text){
       string += text;
     });
-    request.on('end', function() {
+    request.on("end", function() {
     var parsed = JSON.parse(string);
     results.push(parsed);
     });
@@ -42,7 +39,7 @@ exports.handleRequest = function(request, response) {
    * below about CORS. */
   var headers = defaultCorsHeaders;
 
-  headers['Content-Type'] = "text/plain";
+  headers["Content-Type"] = "text/plain";
 
   /* .writeHead() tells our server what HTTP status code to send back */
   response.writeHead(statusCode, headers);
@@ -53,13 +50,57 @@ exports.handleRequest = function(request, response) {
    * up in the browser.*/
   // console.log(request);
   // if (request.method === 'POST') {
-  results.push(request.json);
+  // results.push(request.json);
   // }
   var messages = JSON.stringify({results: results});
 
   response.end(messages);
 };
 
+exports.handler = function(request, response) {
+  console.log("Serving request type " + request.method + " for url " + request.url);
+
+  var statusCode = 404;
+  if (request.url === "/classes/room1" && request.method === "GET") {
+    statusCode = 200;
+  }
+
+  if (request.url === "/classes/room1" && request.method === "POST") {
+    console.log("last test");
+    statusCode = 201;
+
+    var string = "";
+    request.on("data", function(text){
+      string += text;
+    });
+
+    request.on("end", function() {
+      var parsed = JSON.parse(string);
+      results.push(parsed);
+    });
+  }
+
+  /* Without this line, this server wouldn't work. See the note
+   * below about CORS. */
+  var headers = defaultCorsHeaders;
+
+  headers["Content-Type"] = "text/plain";
+
+  /* .writeHead() tells our server what HTTP status code to send back */
+  response.writeHead(statusCode, headers);
+
+  /* Make sure to always call response.end() - Node will not send
+   * anything back to the client until you do. The string you pass to
+   * response.end() will be the body of the response - i.e. what shows
+   * up in the browser.*/
+  // console.log(request);
+  // if (request.method === 'POST') {
+  // results.push(request.json);
+  // }
+  var messages = JSON.stringify({results: results});
+
+  response.end(messages);
+};
 /* These headers will allow Cross-Origin Resource Sharing (CORS).
  * This CRUCIAL code allows this server to talk to websites that
  * are on different domains. (Your chat client is running from a url

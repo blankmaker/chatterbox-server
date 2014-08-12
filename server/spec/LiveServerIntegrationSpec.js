@@ -52,7 +52,7 @@ describe('Live Node Chat Server', function() {
     var requestParams = {method: 'POST',
       uri: 'http://127.0.0.1:3000/classes/messages',
       json: {
-        username: 'Jono',
+        username: 'HELLO',
         message: 'Do my bidding!'}
     };
 
